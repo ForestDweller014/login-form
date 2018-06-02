@@ -1,0 +1,221 @@
+<html>
+<head>
+<style>
+#error {
+
+}
+
+#rusernametextbox {
+
+}
+
+#rpasswordtextbox1 {
+
+}
+
+#rpasswordtextbox2 {
+
+}
+
+#passwordtextbox {
+    position: absolute;
+    top: 350;
+    left: 600;
+}
+
+#usernametextbox {
+    position: absolute;
+    top: 300;
+    left: 600;
+}
+
+#usernameText {
+    position: absolute;
+    top: 285;
+    left: 525;
+}
+
+#passwordText {
+    position: absolute;
+    top: 335;
+    left: 525;
+}
+
+#createusername {
+    position: absolute;
+    top: 285;
+    left: 525;
+}
+
+#createpassword {
+    position: absolute;
+    top: 335;
+    left: 525;
+}
+
+#confirmpassword {
+    position: absolute;
+    top: 335;
+    left: 525;
+}
+
+#login {
+    position: absolute;
+    top: 305;
+    left: 800;
+    width: 60;
+    height: 60;
+}
+
+#register {
+    position: absolute;
+    top: 400;
+    left: 550;
+    width: 60;
+    height: 20;
+}
+
+#registerform {
+    z-index: -10;
+    color: red;
+}
+</style>
+</head>
+<body>
+<div id = "registerform">
+    <p id = "createusername">Create Username:</p>
+    <input id = "rusernametextbox" name = "rusernametextbox" type = "text">
+    <p id = "createpassword">Create Password:</p>
+    <input id = "rpasswordtextbox1" name = "rpasswordtextbox1" type = "password">
+    <p id = "confirmpassword">Confirm Password:</p>
+    <input id = "rpasswordtextbox2" type = "password">
+    <button id = "register" name = "Register" onclick = "sendRegisterInfo(document.getElementById('rusernametextbox').value, document.getElementById('rpasswordtextbox1').value, document.getElementById('rpasswordtextbox2').value);">Register</button>
+</div>
+
+<div id = "loginform">
+    <p id = "usernameText">Username:</p>
+    <input id = "usernametextbox" name = "usernametextbox" type = "text">
+    <p id = "passwordText">Password:</p>
+    <input id = "passwordtextbox" name = "passwordtextbox" type = "password">
+    <button id = "login" name = "Login" onclick = "sendLoginInfo(document.getElementById('usernametextbox').value, document.getElementById('passwordtextbox').value);">Login</button>
+</div>
+
+<p id = "error"></p>
+<i id = "number"> </i><i id = "word"></i> <i>registered!</i>
+
+<script>
+if (window.XMLHttpRequest) {
+    xmlhttp = new XMLHttpRequest();
+} else {
+    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+}
+
+xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        num = this.responseText;
+        singular = false;
+        document.getElementById("number").innerHTML = num;
+        for (x = 0; x < num.length; x++) {
+            if (num.charAt(x) == "1") {
+                x == num.length;
+                singular = true;
+            }
+        }
+        if (singular == true) {
+            document.getElementById("word").innerHTML = "person has"; 
+        } else {
+            document.getElementById("word").innerHTML = "people have";
+        }
+    }
+};
+xmlhttp.open("GET","LoginCheck.php?numreq=true&status=nullifier", true);
+xmlhttp.send();
+
+function sendRegisterInfo(rusername, rpassword1, rpassword2) {
+    document.getElementById("loginform").style.zIndex = "-10";
+    document.getElementById("registerform").style.zIndex = "10";
+    spacesu = false;
+    spacesp = false;
+	if (rusername != "" && rpassword1 != "" && rpassword2 != "") {
+		document.getElementById("error").innerHTML = "";
+
+        if (rpassword1 == rpassword2) {
+            document.getElementById('matchingerror').innerHTML = "";
+        } else {
+            document.getElementById('rpasswordtextbox1').value = "";
+            document.getElementById('rpasswordtextbox2').value = "";
+            document.getElementById('error').innerHTML = "Passwords do not match";
+        }
+
+        if (rusername.length < 3) {
+            document.getElementById("error").innerHTML = "Username cannot be less than 3 characters";
+        } else {
+            document.getElementById("error").innerHTML = "";
+        }
+
+        if (rusername.length > 12) {
+            document.getElementById("error").innerHTML = "Username cannot be over 12 characters";
+        } else {
+            document.getElementById("error").innerHTML = "";
+        }
+
+        if (rpassword1.length < 5) {
+            document.getElementById("error").innerHTML = "Password cannot be less than 5 characters";
+        } else {
+            document.getElementById("error").innerHTML = "";
+        }
+
+        for (i = 0; i < rusername.length; i++) {
+            if (rusername.charAt(i) == " ") {
+                i == rusername.length;
+                document.getElementById("error").innerHTML = "Your username may not contain spaces";
+                spacesu = true;
+            }
+        }
+
+        if (spacesu == false) {
+            document.getElementById("error").innerHTML = "";
+        }
+
+        for (j = 0; j < rpassword1.length; j++) {
+            if (rpassword1.charAt(i) == " ") {
+                j == rpassword1.length;
+                spacesp = true;
+                document.getElementById("error").innerHTML = "Your password may not contain spaces";
+            }
+        }
+
+        if (spacesp == false) {
+            document.getElementById("error").innerHTML = "";
+        }
+	} else {
+		document.getElementById("error").innerHTML = "Please fill all fields";
+    }
+    
+	if (rpassword1 == rpassword2 && rusername != "" && rpassword1 != "" && rusername.length <= 12 && rusername.length >= 3 && rpassword1.length >= 5 && spacesp == false && spacesu == false) {
+        xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("error").innerHTML = this.responseText;
+            }
+        };
+        xmlhttp.open("GET","LoginCheck.php?&status=reg&registeredUsername="+rusername+"&registeredPassword="+rpassword1+"&numreq=nullifier", true);
+        xmlhttp.send();
+    }    
+}
+
+function sendLoginInfo(username, password) {
+    loginsuccess = "variable";
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            loginsuccess = this.responseText;
+            if (loginsuccess != "Login was successful") {
+                document.getElementById("loginerror").innerHTML = loginsuccess;
+            }
+        }
+    };
+    xmlhttp.open("GET","LoginCheck.php?username="+username+"&password="+password+"&status=log&numreq=nullifier", true);
+    xmlhttp.send();
+}
+</script>
+</body>
+</html>
