@@ -54,5 +54,6 @@ if ($status == "log") {
 		    }
 	  }
 }
+
 mysqli_close($conn);
 ?>
